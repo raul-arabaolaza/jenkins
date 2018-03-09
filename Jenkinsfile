@@ -70,10 +70,12 @@ for(i = 0; i < buildTypes.size(); i++) {
 builds.failFast = failFast
 parallel builds
 
-unarchive mapping: ['**/target/linux-jenkins.war': 'jenkins.war']
-def url = "file://" + pwd() + "/jenkins.war"
-writeFile file: 'essentials.yml', text: 'ath: "default"'
-runATH(jenkins: url)
+node("linux") {
+    checkout scm
+    unarchive mapping: ['**/target/*.war': 'archives']
+    def url = "file://" + pwd() + "/archives/war/target/linux-jenkins.war"
+    runATH(jenkins: url)
+}
 
 // This method sets up the Maven and JDK tools, puts them in the environment along
 // with whatever other arbitrary environment variables we passed in, and runs the
