@@ -1,5 +1,6 @@
 #!/usr/bin/env groovy
 
+@Library('pipeline-library') _
 /*
  * This Jenkinsfile is intended to run on https://ci.jenkins.io and may fail anywhere else.
  * It makes assumptions about plugins being installed, labels mapping to nodes that can build what is needed, etc.
@@ -68,6 +69,11 @@ for(i = 0; i < buildTypes.size(); i++) {
 
 builds.failFast = failFast
 parallel builds
+
+unarchive mapping: ['**/target/linux-jenkins.war': 'jenkins.war']
+def url = "file://" + pwd() + "/jenkins.war"
+writeFile file: 'essentials.yml', text: 'ath: "default"'
+runATH(jenkins: url)
 
 // This method sets up the Maven and JDK tools, puts them in the environment along
 // with whatever other arbitrary environment variables we passed in, and runs the
