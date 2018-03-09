@@ -44,6 +44,10 @@ for(i = 0; i < buildTypes.size(); i++) {
                             if(isUnix()) {
                                 sh mvnCmd
                                 sh 'test `git status --short | tee /dev/stderr | wc --bytes` -eq 0'
+                                // Stash for ATH run
+                                dir ("war/target") {
+                                    stash name: "jenkins.war", includes: "jenkins.war"
+                                }
                             } else {
                                 bat mvnCmd
                             }
@@ -72,9 +76,9 @@ parallel builds
 
 node("linux") {
     checkout scm
-    unarchive mapping: ['**/target/*.war': 'archives']
-    def url = "file://" + pwd() + "/archives/war/target/linux-jenkins.war"
-    runATH(jenkins: url)
+    unstash "jenkins.war"
+    def fileUrl = "file://" + pwd() + "/jenkins.war"
+    runATH(jenkins: fileUrl)
 }
 
 // This method sets up the Maven and JDK tools, puts them in the environment along
