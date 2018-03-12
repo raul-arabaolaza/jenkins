@@ -46,7 +46,7 @@ for(i = 0; i < buildTypes.size(); i++) {
                                 sh 'test `git status --short | tee /dev/stderr | wc --bytes` -eq 0'
                                 // Stash for ATH run
                                 dir ("war/target") {
-                                    stash name: "jenkins.war", includes: "jenkins.war"
+                                    stash name: "war", includes: "*.war"
                                 }
                             } else {
                                 bat mvnCmd
@@ -76,7 +76,8 @@ parallel builds
 
 node("linux") {
     checkout scm
-    unstash "jenkins.war"
+    unstash "war"
+    sh "cp *.war jenkins.war"
     def fileUrl = "file://" + pwd() + "/jenkins.war"
     runATH(jenkins: fileUrl)
 }
