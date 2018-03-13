@@ -45,9 +45,7 @@ for(i = 0; i < buildTypes.size(); i++) {
                                 sh mvnCmd
                                 sh 'test `git status --short | tee /dev/stderr | wc --bytes` -eq 0'
                                 // Stash for ATH run
-                                dir ("war/target") {
-                                    stash name: "war", includes: "*.war"
-                                }
+                                stash name: "metadata", includes: "essentials.yml"
                             } else {
                                 bat mvnCmd
                             }
@@ -75,12 +73,14 @@ builds.failFast = failFast
 parallel builds
 
 node("linux") {
-    checkout scm
-    unstash "war"
-    sh "cp *.war jenkins.war"
+    unstash "metadata"
+    unarchive mapping: ['war/target/linux-jenkins.war': 'jenkins.war']
     def fileUrl = "file://" + pwd() + "/jenkins.war"
-    runATH(jenkins: fileUrl)
+    dir("ath") {
+        runATH(jenkins: fileUrl, metadataFile: "../essentials.yml")
+    }
 }
+
 
 // This method sets up the Maven and JDK tools, puts them in the environment along
 // with whatever other arbitrary environment variables we passed in, and runs the
