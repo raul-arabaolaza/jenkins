@@ -72,13 +72,15 @@ for(i = 0; i < buildTypes.size(); i++) {
 builds.failFast = failFast
 parallel builds
 
-node("linux") {
-    unstash "metadata"
-    unarchive mapping: ['war/target/linux-jenkins.war': 'jenkins.war']
-    def fileUrl = "file://" + pwd() + "/jenkins.war"
-    def metadataPath = pwd() + "/essentials.yml"
-    dir("ath") {
-        runATH(jenkins: fileUrl, metadataFile: metadataPath)
+if (buildTypes.contains("linux")) {
+    node("linux") {
+        unstash "metadata"
+        unarchive mapping: ['war/target/linux-jenkins.war': 'jenkins.war']
+        def fileUrl = "file://" + pwd() + "/jenkins.war"
+        def metadataPath = pwd() + "/essentials.yml"
+        dir("ath") {
+            runATH(jenkins: fileUrl, metadataFile: metadataPath)
+        }
     }
 }
 
