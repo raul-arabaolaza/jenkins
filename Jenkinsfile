@@ -76,8 +76,9 @@ node("linux") {
     unstash "metadata"
     unarchive mapping: ['war/target/linux-jenkins.war': 'jenkins.war']
     def fileUrl = "file://" + pwd() + "/jenkins.war"
+    def metadataPath = pwd() + "/essentials.yml"
     dir("ath") {
-        runATH(jenkins: fileUrl, metadataFile: "../essentials.yml")
+        runATH(jenkins: fileUrl, metadataFile: metadataPath)
     }
 }
 
